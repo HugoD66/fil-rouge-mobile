@@ -1,25 +1,26 @@
-import MapboxGL from '@rnmapbox/maps';
-import { useEffect, useState } from 'react';
+import MapView from 'react-native-maps';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-const WAYPOINTS: [number, number][] = [
-  [7.26, 43.71],   // Nice (départ)
-  [5.37, 43.30],   // Marseille
-  [3.88, 43.61],   // Montpellier
-  [5.72, 45.19],   // Grenoble
-  [4.83, 45.75],   // Lyon
-  [1.44, 43.60],   // Toulouse
-  [-0.58, 44.84],  // Bordeaux
-  [-1.55, 47.22],  // Nantes
-  [2.35, 48.86],   // Paris
-  [7.75, 48.58],   // Strasbourg
+const WAYPOINTS = [
+  { latitude: 43.71, longitude: 7.26 },   // Nice (départ)
+  { latitude: 43.30, longitude: 5.37 },   // Marseille
+  { latitude: 43.61, longitude: 3.88 },   // Montpellier
+  { latitude: 45.19, longitude: 5.72 },   // Grenoble
+  { latitude: 45.75, longitude: 4.83 },   // Lyon
+  { latitude: 43.60, longitude: 1.44 },   // Toulouse
+  { latitude: 44.84, longitude: -0.58 },  // Bordeaux
+  { latitude: 47.22, longitude: -1.55 },  // Nantes
+  { latitude: 48.86, longitude: 2.35 },   // Paris
+  { latitude: 48.58, longitude: 7.75 },   // Strasbourg
 ];
 
-const ZOOM = 9.5;
-const FLY_DURATION = 9000;
-const STEP_INTERVAL = 12000;
+const DELTA = 0.8;
+const STEP_INTERVAL = 10000;
+const FLY_DURATION = 8000;
 
 export function MapBackground() {
+  const mapRef = useRef<MapView>(null);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -29,26 +30,39 @@ export function MapBackground() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    mapRef.current?.animateToRegion(
+      {
+        ...WAYPOINTS[index],
+        latitudeDelta: DELTA,
+        longitudeDelta: DELTA,
+      },
+      FLY_DURATION,
+    );
+  }, [index]);
+
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <MapboxGL.MapView
+      <MapView
+        ref={mapRef}
         style={StyleSheet.absoluteFill}
-        styleURL="mapbox://styles/mapbox/light-v11"
+        mapType="standard"
+        initialRegion={{
+          ...WAYPOINTS[0],
+          latitudeDelta: DELTA,
+          longitudeDelta: DELTA,
+        }}
         scrollEnabled={false}
-        pitchEnabled={false}
-        rotateEnabled={false}
         zoomEnabled={false}
-        compassEnabled={false}
-        scaleBarEnabled={false}
-        logoEnabled={false}
-        attributionEnabled={false}>
-        <MapboxGL.Camera
-          centerCoordinate={WAYPOINTS[index]}
-          zoomLevel={ZOOM}
-          animationMode="flyTo"
-          animationDuration={FLY_DURATION}
-        />
-      </MapboxGL.MapView>
+        rotateEnabled={false}
+        pitchEnabled={false}
+        showsUserLocation={false}
+        showsMyLocationButton={false}
+        showsCompass={false}
+        showsScale={false}
+        showsTraffic={false}
+        toolbarEnabled={false}
+      />
       <View style={styles.overlay} />
     </View>
   );

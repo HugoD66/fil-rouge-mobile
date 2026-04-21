@@ -11,10 +11,8 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useAuth } from '@/context/auth';
-import { MapBackground } from '@/components/map-background';
 
 export default function LoginScreen() {
-  console.log('[LoginScreen] render');
   const { login } = useAuth();
   const router = useRouter();
 
@@ -44,7 +42,6 @@ export default function LoginScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <MapBackground />
       <View style={styles.card}>
         <View style={styles.brand}>
           <View style={styles.brandLogo} />

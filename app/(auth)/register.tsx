@@ -12,10 +12,8 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { registerRequest } from '@/services/auth';
-import { MapBackground } from '@/components/map-background';
 
 export default function RegisterScreen() {
-  console.log('[RegisterScreen] render');
   const router = useRouter();
 
   const [firstName, setFirstName] = useState('');
@@ -46,7 +44,6 @@ export default function RegisterScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <MapBackground />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
           <View style={styles.brand}>
