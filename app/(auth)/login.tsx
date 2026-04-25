@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/auth';
 
 export default function LoginScreen() {
@@ -18,6 +20,7 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -43,15 +46,7 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.card}>
-        <View style={styles.brand}>
-          <View style={styles.brandLogo} />
-          <View>
-            <Text style={styles.brandTitle}>
-              Fil <Text style={styles.brandAccent}>Rouge</Text>
-            </Text>
-            <Text style={styles.brandSubtitle}>Gestion des interventions</Text>
-          </View>
-        </View>
+        <Image source={require('@/assets/images/logo-transparent.png')} style={styles.logo} resizeMode="contain" />
 
         <Text style={styles.heading}>Connexion</Text>
 
@@ -71,17 +66,22 @@ export default function LoginScreen() {
 
         <View style={styles.field}>
           <Text style={styles.label}>Mot de passe</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="••••••••"
-            placeholderTextColor="#94a3b8"
-            secureTextEntry
-            autoComplete="current-password"
-            value={password}
-            onChangeText={setPassword}
-            onSubmitEditing={handleLogin}
-            returnKeyType="go"
-          />
+          <View style={styles.inputWrap}>
+            <TextInput
+              style={styles.inputWithIcon}
+              placeholder="••••••••"
+              placeholderTextColor="#94a3b8"
+              secureTextEntry={!showPassword}
+              autoComplete="current-password"
+              value={password}
+              onChangeText={setPassword}
+              onSubmitEditing={handleLogin}
+              returnKeyType="go"
+            />
+            <Pressable onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
+              <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="#94a3b8" />
+            </Pressable>
+          </View>
         </View>
 
         {error !== '' && <Text style={styles.error}>{error}</Text>}
@@ -95,15 +95,16 @@ export default function LoginScreen() {
             : <Text style={styles.buttonText}>Se connecter</Text>}
         </Pressable>
 
-        <Link href="/register" asChild>
-          <Pressable style={styles.footer}>
-            <Text style={styles.footerText}>
-              Pas encore inscrit ?{' '}
-              <Text style={styles.footerLink}>Créer un compte</Text>
-            </Text>
-          </Pressable>
-        </Link>
       </View>
+
+      <Link href="/register" asChild>
+        <Pressable style={styles.footer}>
+          <Text style={styles.footerText}>
+            Pas encore inscrit ?{' '}
+            <Text style={styles.footerLink}>Créer un compte</Text>
+          </Text>
+        </Pressable>
+      </Link>
     </KeyboardAvoidingView>
   );
 }
@@ -117,49 +118,24 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderRadius: 20,
     padding: 24,
     width: '100%',
     maxWidth: 400,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
   },
-  brand: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 24,
-  },
-  brandLogo: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#15803d',
-  },
-  brandTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0f172a',
-  },
-  brandAccent: {
-    color: '#f97316',
-  },
-  brandSubtitle: {
-    fontSize: 13,
-    color: '#64748b',
-    marginTop: 1,
+  logo: {
+    width: 80,
+    height: 80,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   heading: {
     fontSize: 20,
     fontWeight: '700',
     color: '#0f172a',
     marginBottom: 20,
+    textAlign: 'center',
   },
   field: {
     marginBottom: 12,
@@ -170,15 +146,34 @@ const styles = StyleSheet.create({
     color: '#64748b',
     marginBottom: 4,
   },
-  input: {
+  inputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e2e8f0',
-    borderRadius: 6,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+  },
+  inputWithIcon: {
+    flex: 1,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
     color: '#0f172a',
-    backgroundColor: '#fff',
+  },
+  eyeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: '#0f172a',
+    backgroundColor: 'rgba(255,255,255,0.9)',
   },
   error: {
     fontSize: 12,
@@ -187,7 +182,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#15803d',
-    borderRadius: 6,
+    borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
     marginTop: 8,
@@ -204,8 +199,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   footer: {
-    marginTop: 20,
+    position: 'absolute',
+    bottom: '10%',
+    left: 0,
+    right: 0,
     alignItems: 'center',
+    padding: 8,
   },
   footerText: {
     fontSize: 13,
