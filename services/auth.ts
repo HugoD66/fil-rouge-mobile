@@ -39,6 +39,8 @@ export interface RegisterPayload {
   lastName: string;
   email: string;
   password: string;
+  zipCode?: string;
+  organizationId?: string;
 }
 
 export async function registerRequest(payload: RegisterPayload): Promise<void> {

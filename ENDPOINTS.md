@@ -24,6 +24,8 @@ Register a new user account.
 | `avatarKey` | string | No | S3 object key | Avatar image key |
 | `address` | string | No | — | Postal address |
 | `role` | string | No | `user` \| `technician` | User role |
+| `zipCode` | string | No | — | Zip code du département sélectionné |
+| `organizationId` | string (UUID v4) | No | valid UUID | Organization to link the user to |
 
 **Response:** `Person` object
 

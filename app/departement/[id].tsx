@@ -7,6 +7,7 @@ import { useDepartements } from '@/context/geo';
 import { DepartementWithGeom } from '@/services/geo';
 import { registerRequest } from '@/services/auth';
 import { registerDraft } from '@/store/register-draft';
+import { useAuth } from '@/context/auth';
 
 function getPolygons(dept: DepartementWithGeom) {
   const { type, coordinates } = dept.coordinate.geom;
@@ -35,9 +36,11 @@ function boundingRegion(polygons: { latitude: number; longitude: number }[][]) {
 export default function DepartementScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { login } = useAuth();
   const { departements, loading } = useDepartements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const dept = departements.find(d => d.id === id);
   const polygons = useMemo(() => (dept ? getPolygons(dept) : []), [dept]);
@@ -52,9 +55,13 @@ export default function DepartementScreen() {
         lastName: registerDraft.lastName.trim(),
         email: registerDraft.email.trim(),
         password: registerDraft.password,
+        zipCode: dept.zipCode,
       });
+      setSuccess(true);
+      await new Promise(res => setTimeout(res, 1500));
+      await login(registerDraft.email.trim(), registerDraft.password);
       registerDraft.selectedDept = null;
-      router.replace('/login');
+      router.replace('/(app)/map');
     } catch (e: any) {
       setError(e?.message ?? 'Une erreur est survenue.');
     } finally {
@@ -98,6 +105,7 @@ export default function DepartementScreen() {
       {/* Footer — validate */}
       <View style={styles.footer}>
         {error !== '' && <Text style={styles.errorMsg}>{error}</Text>}
+        {success && <Text style={styles.successMsg}>Inscription réussie</Text>}
         <View style={styles.footerRow}>
           <Pressable
             style={({ pressed }) => [styles.circleBtn, styles.circleBtnSecondary, pressed && styles.circleBtnSecondaryPressed]}
@@ -180,6 +188,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     elevation: 2,
+  },
+  successMsg: {
+    fontSize: 13,
+    color: '#fff',
+    marginBottom: 8,
+    textAlign: 'center',
+    backgroundColor: '#15803d',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    elevation: 2,
+    overflow: 'hidden',
   },
   backBtn: {
     paddingHorizontal: 20,

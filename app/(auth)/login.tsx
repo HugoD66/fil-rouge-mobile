@@ -33,7 +33,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email.trim(), password);
-      router.replace('/(tabs)');
+      router.replace('/(app)/map');
     } catch (e: any) {
       setError(e?.message ?? 'Une erreur est survenue.');
     } finally {
@@ -85,6 +85,18 @@ export default function LoginScreen() {
         </View>
 
         {error !== '' && <Text style={styles.error}>{error}</Text>}
+
+        <Pressable
+          style={styles.prefillBtn}
+          onPress={() => { setEmail('user_perpignan8@email.com'); setPassword('password'); }}>
+          <Text style={styles.prefillBtnText}>User informations</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.prefillBtn}
+          onPress={() => { setEmail('technician_perpignan_20@email.com'); setPassword('password'); }}>
+          <Text style={styles.prefillBtnText}>Operator informations</Text>
+        </Pressable>
 
         <Pressable
           style={({ pressed }) => [styles.button, pressed && styles.buttonPressed, loading && styles.buttonDisabled]}
@@ -197,6 +209,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  prefillBtn: {
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginBottom: 8,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+  },
+  prefillBtnText: {
+    fontSize: 13,
+    color: '#64748b',
+    fontWeight: '500',
   },
   footer: {
     position: 'absolute',

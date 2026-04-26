@@ -27,9 +27,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useDepartements } from '@/context/geo';
 import { DepartementWithGeom } from '@/services/geo';
 import { registerDraft as draft } from '@/store/register-draft';
+import { useAuth } from '@/context/auth';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { login } = useAuth();
   const { height } = useWindowDimensions();
   const { departements, load: loadDepartements } = useDepartements();
 
@@ -44,6 +46,7 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   function setFirstName(v: string) { draft.firstName = v; setFirstNameState(v); }
@@ -111,8 +114,12 @@ export default function RegisterScreen() {
         lastName: lastName.trim(),
         email: email.trim(),
         password,
+        zipCode: selected!.zipCode,
       });
-      router.replace('/login');
+      setSuccess(true);
+      await new Promise(res => setTimeout(res, 1500));
+      await login(email.trim(), password);
+      router.replace('/(app)/map');
     } catch (e: any) {
       setError(e?.message ?? 'Une erreur est survenue.');
     } finally {
@@ -177,7 +184,7 @@ export default function RegisterScreen() {
                 />
               </View>
 
-              <View style={styles.field}>
+<View style={styles.field}>
                 <Text style={styles.label}>Mot de passe</Text>
                 <View style={styles.inputWrap}>
                   <TextInput
@@ -198,6 +205,18 @@ export default function RegisterScreen() {
               </View>
 
               {error !== '' && <Text style={styles.error}>{error}</Text>}
+              {success && <Text style={styles.successMsg}>Inscription réussie</Text>}
+
+              <Pressable
+                style={styles.prefillBtn}
+                onPress={() => {
+                  setFirstName('Firstname');
+                  setLastName('Lastname');
+                  setEmail('mobille_user_perpignan@email.com');
+                  setPassword('password');
+                }}>
+                <Text style={styles.prefillBtnText}>User informations</Text>
+              </Pressable>
 
               <Pressable
                 style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
@@ -237,7 +256,13 @@ export default function RegisterScreen() {
                 <View style={styles.modalSheet}>
                   <Text style={styles.modalTitle}>Choisir un département</Text>
                   <FlatList
-                    data={departements}
+                    data={[...departements].sort((a, b) => {
+                      const priority: Record<string, number> = { '66': 0, '33': 1 };
+                      const pa = priority[a.zipCode] ?? 2;
+                      const pb = priority[b.zipCode] ?? 2;
+                      if (pa !== pb) return pa - pb;
+                      return a.zipCode.localeCompare(b.zipCode, undefined, { numeric: true });
+                    })}
                     keyExtractor={(d) => d.id}
                     keyboardShouldPersistTaps="handled"
                     renderItem={({ item: dept }) => (
@@ -389,6 +414,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  successMsg: {
+    fontSize: 13,
+    color: '#fff',
+    marginBottom: 8,
+    textAlign: 'center',
+    backgroundColor: '#15803d',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    overflow: 'hidden',
+  },
+  prefillBtn: {
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginBottom: 8,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+  },
+  prefillBtnText: {
+    fontSize: 13,
+    color: '#64748b',
+    fontWeight: '500',
   },
   buttonOutline: {
     borderWidth: 1,
