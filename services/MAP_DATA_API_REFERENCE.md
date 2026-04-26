@@ -231,7 +231,29 @@ Retourne `null` si la personne n'appartient à aucune organisation.
 
 ---
 
-### 4.6 `POST /coordinate` [JWT]
+### 4.6 `GET /person/owner-by-zip-code` [JWT]
+
+Retourne la liste des personnes **propriétaires d'une organisation** pour un `zipCode` donné.
+
+**Query param requis** : `?zipCode=66`
+
+**Réponse** : `PersonSearchResultDto`
+
+```typescript
+type PersonSearchResultDto = {
+  items: Person[];   // liste des propriétaires trouvés
+  total: number;     // nombre total de résultats
+  emptyCode?: 'NO_PERSON_MATCH' | null;  // présent si aucun résultat
+}
+```
+
+**Logique** : joint `person → ownedOrganization` et filtre par `org.zipCode`.
+
+**Cas d'usage mobile** : afficher l'identité du responsable du département de l'utilisateur connecté (icône couronne).
+
+---
+
+### 4.7 `POST /coordinate` [JWT]
 
 Crée une coordonnée autonome (non rattachée à une intervention).
 

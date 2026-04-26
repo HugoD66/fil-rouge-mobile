@@ -60,7 +60,7 @@ export default function DepartementScreen() {
       setSuccess(true);
       await new Promise(res => setTimeout(res, 1500));
       await login(registerDraft.email.trim(), registerDraft.password);
-      registerDraft.selectedDept = null;
+      registerDraft.selectedRegion = region;
       router.replace('/(app)/map');
     } catch (e: any) {
       setError(e?.message ?? 'Une erreur est survenue.');

@@ -16,10 +16,16 @@ export interface DepartementWithGeom {
 
 export async function fetchDepartements(): Promise<DepartementWithGeom[]> {
   const url = `${BASE_URL}/departement/with-geom`;
-  console.log('[Geo] fetch →', url);
   const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Impossible de charger les départements (${res.status})`);
-  }
+  if (!res.ok) throw new Error(`Impossible de charger les départements (${res.status})`);
+  return res.json();
+}
+
+export async function fetchPersonDepartement(personId: string, token: string): Promise<DepartementWithGeom | null> {
+  const res = await fetch(`${BASE_URL}/departement/${personId}/with-geom`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Impossible de charger le département (${res.status})`);
   return res.json();
 }
